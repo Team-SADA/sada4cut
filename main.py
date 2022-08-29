@@ -49,11 +49,12 @@ def makeframe(frame_path):
     roi = cv2.resize(qrimg, dsize=(rp2[0] - rp1[0], rp2[1] - rp1[1]), interpolation=cv2.INTER_AREA)
     frame[rp1[1]+1:rp2[1]+1, rp1[0]:rp2[0]] = roi
 
-    return frame
+    return frame,eigen
 
 # 모든 프레임에 대해 이미지 넣고 결과 저장하기
 i=1
 for frame in glob.iglob('frames/*.png', recursive=True):
-    result = makeframe(frame)
+    result,eigen = makeframe(frame)
     cv2.imwrite('results/result'+str(i)+'.png', result)
+    uploadtoServer('results/result'+str(i)+'.png',eigen)
     i += 1
