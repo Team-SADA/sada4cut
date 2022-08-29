@@ -24,7 +24,7 @@ def urltoQR(path, url):
 
 
 def connectServer(ftp):
-    host, user, pw = 'sada.dothome.co.kr', 'sada', 'gbshs2022!!'
+    host, user, pw = 'sada.dothome.co.kr', 'sada', 'gbshs2020!!'
     ftp.connect(host=host, port=21)
     ftp.encoding = 'utf-8'
     s = ftp.login(user=user, passwd=pw)
