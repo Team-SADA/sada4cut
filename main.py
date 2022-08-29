@@ -5,28 +5,26 @@ from qr import *
 def makeframe(frame_path):
     # 프레임 이미지 불러오기
     frame = cv2.imread(frame_path)
-    frame = cv2.resize(frame, dsize=(756,1134), interpolation=cv2.INTER_AREA)
-    # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    frame = cv2.resize(frame, dsize=(2000,3000),interpolation=cv2.INTER_AREA)
 
     # 프레임 박스 정보
     left_boxes = {
-        'box1': [(16, 10), (356, 239)],
-        'box2': [(16, 257), (356, 484)],
-        'box3': [(16, 498), (356, 727)],
-        'box4': [(16, 744), (356, 972)]
+        'box1': [(45, 35), (952, 642)],
+        'box2': [(45, 680), (952, 1287)],
+        'box3': [(45, 1325), (952, 642 + 645 * 2)],
+        'box4': [(45, 1970), (952, 642 + 645 * 3)]
     }
 
     right_boxes = {
-        'box5': [(393, 10), (735, 239)],
-        'box6': [(393, 257), (735, 484)],
-        'box7': [(393, 498), (735, 727)],
-        'box8': [(393, 744), (735, 972)]
+        'box5': [(1045, 35), (1952, 642)],
+        'box6': [(1045, 680), (1952, 1287)],
+        'box7': [(1045, 1325), (1952, 642 + 645 * 2)],
+        'box8': [(1045, 1970), (1952, 642 + 645 * 3)]
     }
 
     # 프레임 위에 이미지 넣기
     for (filename, left_box, right_box) in zip(glob.iglob('photos/*.jpg', recursive=True), left_boxes.values(), right_boxes.values()):
         img = cv2.imread(filename)
-        #img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         lp1, lp2 = left_box
         rp1, rp2 = right_box
         roi = cv2.resize(img, dsize=(lp2[0] - lp1[0], lp2[1] - lp1[1]), interpolation=cv2.INTER_AREA)
@@ -42,8 +40,13 @@ def makeframe(frame_path):
     qrimg = qrimg[35:w-35,35:h-35]
 
     # 프레임에 QR코드 넣기
-    lp1,lp2 = [(289, 1045), (356, 1113)]
-    rp1,rp2 = [(669, 1047), (735, 1113)]
+    k0, k1 = [762,2766], [949,2954]
+    sk = 18
+    lp1 = (k0[0]+sk,k0[1]+sk)
+    lp2 = (k1[0]-sk,k1[1]-sk)
+    rp1 = (k0[0]+sk+1000,k0[1]+sk)
+    rp2 = (k1[0]-sk+1000,k1[1]-sk)
+
     roi = cv2.resize(qrimg, dsize=(lp2[0] - lp1[0], lp2[1] - lp1[1]), interpolation=cv2.INTER_AREA)
     frame[lp1[1]+2:lp2[1]+2, lp1[0]+1:lp2[0]+1] = roi
     roi = cv2.resize(qrimg, dsize=(rp2[0] - rp1[0], rp2[1] - rp1[1]), interpolation=cv2.INTER_AREA)
@@ -53,8 +56,8 @@ def makeframe(frame_path):
 
 # 모든 프레임에 대해 이미지 넣고 결과 저장하기
 i=1
-for frame in glob.iglob('frames/*.png', recursive=True):
+for frame in glob.iglob('frames/*.jpg', recursive=True):
     result,eigen = makeframe(frame)
     cv2.imwrite('results/result'+str(i)+'.png', result)
-    uploadtoServer('results/result'+str(i)+'.png',eigen)
+    # uploadtoServer('results/result'+str(i)+'.png',eigen)
     i += 1
