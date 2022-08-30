@@ -24,3 +24,5 @@ def printFile(path):
   hDC.EndPage ()
   hDC.EndDoc ()
   hDC.DeleteDC ()
+
+printFile('')

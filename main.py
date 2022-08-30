@@ -54,10 +54,17 @@ def makeframe(frame_path):
 
     return frame,eigen
 
+
+def generateImage(frameNum):
+    frame = 'frames/'+str(frameNum)+'.jpg'
+    result, eigen = makeframe(frame)
+    cv2.imwrite('results/' + eigen + '.png', result)
+    uploadtoServer('results/' + eigen + '.png', eigen)
+
 # 모든 프레임에 대해 이미지 넣고 결과 저장하기
-i=1
+'''i=1
 for frame in glob.iglob('frames/*.jpg', recursive=True):
     result,eigen = makeframe(frame)
-    cv2.imwrite('results/result'+str(i)+'.png', result)
-    # uploadtoServer('results/result'+str(i)+'.png',eigen)
-    i += 1
+    cv2.imwrite('results/'+eigen+'.png', result)
+    uploadtoServer('results/'+eigen+'.png',eigen)
+    i += 1'''
