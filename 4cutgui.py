@@ -119,6 +119,9 @@ while SB == 0:
         if event.type == pygame.MOUSEBUTTONDOWN:
             mx, my = pygame.mouse.get_pos()
             print(mx, my)
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                exit()
     if SN == 1:
         slide1.show()
         if 768 < mx < 1153 and 641 < my < 760:
@@ -174,15 +177,15 @@ while SB == 0:
         slide4.show()
         img = webcam.get_image()
         nimg = pygame.transform.flip(img, True, False)
-        pygame.image.save(img, 'photos/img.jpg')
+
         end = time.time()
-        number = myFont.render(str(8-int(end-begin)), True, (0, 0, 0))
+        number = myFont.render(str(8-int(end-begin))+'          '+str(CUT)+'/4', True, (0, 0, 0))
         if int(end-begin) == 8:
-            if CUT <= 4:
-                pygame.image.save(img, 'photos/img'+str(CUT)+'.jpg')
-                CUT += 1
-                begin = time.time()
-            else:
+            pygame.image.save(img, 'photos/img'+str(CUT)+'.jpg')
+            CUT += 1
+            begin = time.time()
+            pygame.time.delay(1500)
+            if CUT == 5:
                 SN = 5
         screen.blit(number, number_rect)
         screen.blit(pygame.transform.scale(nimg, (640 * 1.8, 480 * 1.8)), (381, 190))
@@ -191,6 +194,5 @@ while SB == 0:
     elif SN == 5:
         slide6.show()
         pygame.display.flip()
-
 
 pygame.quit()
