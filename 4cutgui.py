@@ -3,6 +3,7 @@ import pygame.camera
 import pygame.image
 import cv2
 import time
+
 # initialize game
 pygame.init()
 
@@ -13,8 +14,9 @@ screen = pygame.display.set_mode(size)
 pygame.display.set_icon(icon)
 pygame.display.set_caption('사다네컷')
 
+
 # game setting
-clock = pygame.time.Clock()
+
 
 class Obj:
     def __init__(self):
@@ -88,24 +90,35 @@ slide1.show()
 FRAME_NUM = 0
 PEOPLE_NUM = 0
 mx, my = 0, 0
+counter = 0
+CUT = 1
 
 # camera setting
-pygame.camera.init()
+pygame.camera.init(None)
 cameras = pygame.camera.list_cameras()
-webcam = pygame.camera.Camera(cameras[0])
+webcam = pygame.camera.Camera(cameras[1])
 webcam.start()
+
+# Time
+myFont = pygame.font.SysFont("malgungothic", 100, True, False)
+number = myFont.render("8", True, (0, 0, 0))
+number_rect = number.get_rect()
+number_rect.centerx = 967
+number_rect.y = 50
+
+clock = pygame.time.Clock()
 
 while SB == 0:
     # FPS setting
     pygame.time.delay(10)
     # update
-    #pygame.display.flip()
+    # pygame.display.flip()
     pygame.display.update()
     # sense inputs
     for event in pygame.event.get():
         if event.type == pygame.MOUSEBUTTONDOWN:
             mx, my = pygame.mouse.get_pos()
-            print(mx,my)
+            print(mx, my)
     if SN == 1:
         slide1.show()
         if 768 < mx < 1153 and 641 < my < 760:
@@ -113,7 +126,7 @@ while SB == 0:
     elif SN == 2:
         slide2.show()
         # check1
-        if bool1 == False:
+        if not bool1:
             if 189 < mx < 453 and 178 < my < 577:
                 FRAME_NUM = 1
                 check1.x, check1.y = 194, 263
@@ -135,34 +148,49 @@ while SB == 0:
                 check1.x, check1.y = 1440, 263
                 bool1 = True
         # check2
-        if bool2 == False:
+        if not bool2:
             if 605 < mx < 814 and 752 < my < 964:
                 PEOPLE_NUM = 2
-                check2.x, check2.y = 610,724
+                check2.x, check2.y = 610, 724
                 bool2 = True
             elif 1104 < mx < 1316 and 753 < my < 963:
                 PEOPLE_NUM = 4
-                check2.x, check2.y = 1100,724
+                check2.x, check2.y = 1100, 724
                 bool2 = True
-        if bool1: check1.show()
-        if bool2: check2.show()
+        if bool1:
+            check1.show()
+        if bool2:
+            check2.show()
         if bool1 and bool2:
             SN = 3
-            #pygame.time.delay(500)
-    elif SN==3:
+    elif SN == 3:
         slide3.show()
+        pygame.display.flip()
         pygame.time.delay(3000)
         SN = 4
+        begin = time.time()
 
-    elif SN==4:
-        # opencv로 이미지 찍게 하자 이거는 pygame 이용
+    elif SN == 4:
         slide4.show()
         img = webcam.get_image()
-        img = pygame.transform.flip(img, True, False)
-        # draw frame
-        screen.blit(pygame.transform.scale(img, (640*1.8, 480*1.8)), (381, 190))
-        # screen.blit(overlay, (258, 178))
+        nimg = pygame.transform.flip(img, True, False)
+        pygame.image.save(img, 'photos/img.jpg')
+        end = time.time()
+        number = myFont.render(str(8-int(end-begin)), True, (0, 0, 0))
+        if int(end-begin) == 8:
+            if CUT <= 4:
+                pygame.image.save(img, 'photos/img'+str(CUT)+'.jpg')
+                CUT += 1
+                begin = time.time()
+            else:
+                SN = 5
+        screen.blit(number, number_rect)
+        screen.blit(pygame.transform.scale(nimg, (640 * 1.8, 480 * 1.8)), (381, 190))
         pygame.display.flip()
-        # grab next frame
+
+    elif SN == 5:
+        slide6.show()
+        pygame.display.flip()
+
 
 pygame.quit()
