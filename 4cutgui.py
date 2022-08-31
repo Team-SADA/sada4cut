@@ -3,6 +3,7 @@ import pygame.camera
 import pygame.image
 import cv2
 import time
+import playsound
 from frameGen import *
 from qr import *
 from printers import *
@@ -181,10 +182,13 @@ while SB == 0:
         img = webcam.get_image()
         nimg = pygame.transform.flip(img, True, False)
 
-        tt = 4 # time sec
+        tt = 8 # time sec
         end = time.time()
         number = myFont.render(str(tt-int(end-begin))+'          '+str(CUT)+'/4', True, (0, 0, 0))
         if int(end-begin) == tt:
+            pygame.mixer.init()
+            pygame.mixer.music.load('camerasound.mp3')
+            pygame.mixer.music.play()
             pygame.image.save(img, 'photos/img'+str(CUT)+'.jpg')
             CUT += 1
             begin = time.time()
