@@ -99,10 +99,15 @@ counter = 0
 CUT = 1
 
 # camera setting
-pygame.camera.init(None)
-cameras = pygame.camera.list_cameras()
-webcam = pygame.camera.Camera(cameras[1])
-webcam.start()
+codec = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
+cam = cv2.VideoCapture(1, cv2.CAP_DSHOW)
+cam.set(6, codec)
+cam.set(5, 30)
+cam.set(3, 1920)
+cam.set(4, 1080)
+cap = cam
+width = int(cam.get(cv2.CAP_PROP_FRAME_WIDTH))
+height = int(cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
 # Time
 myFont = pygame.font.SysFont("malgungothic", 100, True, False)
@@ -180,33 +185,46 @@ while SB == 0:
 
     elif SN == 4:
         slide4.show()
-        img = webcam.get_image() 
-        view = pygame.surfarray.array3d(img)
-        #  convert from (width, height, channel) to (height, width, channel)
-        view = view.transpose([0, 1, 2])
-        #  convert from rgb to bgr
+        ret, img = cap.read()
+        #img = cv2.rotate(img, cv2.cv2.ROTATE_90_CLOCKWISE)
         #img_bgr = cv2.cvtColor(view, cv2.COLOR_RGB2BGR)
-        crop_img = view[:,27:480-27,:]
-        surf = pygame.surfarray.make_surface(crop_img)
-        nimg = pygame.transform.flip(surf, True, False)
+        crop_img = img[:,150:1920-150,:]
+        surf = cv2.cvtColor(crop_img, cv2.COLOR_RGB2BGR)
+        #surf = crop_img.transpose([0, 1, 2])
+        surf = pygame.surfarray.make_surface(surf)
+        nimg = pygame.transform.flip(surf, True,True)
+        # nimg = pygame.transform.flip(surf, True, False)
+        nimg = pygame.transform.rotate(nimg,90)
 
         tt = 8 # time sec
         end = time.time()
         number = myFont.render(str(tt-int(end-begin))+'          '+str(CUT)+'/4', True, (0, 0, 0))
         if int(end-begin) == tt:
-            pygame.mixer.init()
-            pygame.mixer.music.load('camerasound.mp3')
-            pygame.mixer.music.play()
-            im = cv2.rotate(crop_img, cv2.cv2.ROTATE_90_CLOCKWISE)
-            im = Image.fromarray(im)
-            im.save('photos/img'+str(CUT)+'.jpg')
+            if not ret:
+                print("failed to grab frame")
+            img_name = 'photos/img'+str(CUT)+'.jpg'
+            cv2.imwrite(img_name, crop_img)
+            print("{} written!".format(img_name))
             CUT += 1
             begin = time.time()
             pygame.time.delay(1500)
             if CUT == 5:
                 SN = 5
+
+            '''ret, frame = cam.read()
+            if not ret:
+                print("failed to grab frame")
+            img_name = 'photos/img'+str(CUT)+'.jpg'
+            cv2.imwrite(img_name, frame)
+            #print("{} written!".format(img_name))
+            CUT += 1
+            begin = time.time()
+            pygame.time.delay(1500)
+            if CUT == 5:
+                SN = 5'''
         screen.blit(number, number_rect)
-        screen.blit(pygame.transform.scale(nimg, (640 * 1.8, 480 * 1.8)), (381, 190))
+        print(crop_img.shape)
+        screen.blit(pygame.transform.scale(nimg, (1620*0.71, 1080*0.71)), (381, 190))
         pygame.display.flip()
 
     elif SN == 5:
@@ -215,5 +233,13 @@ while SB == 0:
         loc = generateImage(FRAME_NUM)
         for _ in range(FRAME_NUM//2):
             printFile(loc)
+        pygame.time.delay(5000)
+        SN = 1
+        slide1.show()
+        FRAME_NUM = 0
+        PEOPLE_NUM = 0
+        mx, my = 0, 0
+        counter = 0
+        CUT = 1
 
 pygame.quit()
