@@ -38,7 +38,6 @@ def makeframe(frame_path):
             w_f = w - w % 6
             h_f = int(w_f * 2 / 3)
             img = img[((h - h_f) // 2):((h - h_f) // 2 + h_f), :w_f]
-
         lp1, lp2 = left_box
         rp1, rp2 = right_box
         roi = cv2.resize(img, dsize=(lp2[0] - lp1[0], lp2[1] - lp1[1]), interpolation=cv2.INTER_AREA)
