@@ -26,6 +26,18 @@ def makeframe(frame_path):
     # photos/anim/*.jpg
     for (filename, left_box, right_box) in zip(glob.iglob('photos/*.jpg', recursive=True), left_boxes.values(), right_boxes.values()):
         img = cv2.imread(filename)
+        h = len(img)
+        w = len(img[0])
+
+        if w * 2 / 3 > h:
+            h_f = h - h % 6
+            w_f = int(h_f * 3 / 2)
+            img = img[:h_f, ((w - w_f) // 2):((w - w_f) // 2 + w_f)]
+
+        else:
+            w_f = w - w % 6
+            h_f = int(w_f * 2 / 3)
+            img = img[((h - h_f) // 2):((h - h_f) // 2 + h_f), :w_f]
         lp1, lp2 = left_box
         rp1, rp2 = right_box
         roi = cv2.resize(img, dsize=(lp2[0] - lp1[0], lp2[1] - lp1[1]), interpolation=cv2.INTER_AREA)

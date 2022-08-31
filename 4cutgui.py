@@ -1,6 +1,7 @@
 import pygame
 import pygame.camera
 import pygame.image
+from PIL import Image
 import cv2
 import time
 import playsound
@@ -179,8 +180,15 @@ while SB == 0:
 
     elif SN == 4:
         slide4.show()
-        img = webcam.get_image()
-        nimg = pygame.transform.flip(img, True, False)
+        img = webcam.get_image() 
+        view = pygame.surfarray.array3d(img)
+        #  convert from (width, height, channel) to (height, width, channel)
+        view = view.transpose([0, 1, 2])
+        #  convert from rgb to bgr
+        #img_bgr = cv2.cvtColor(view, cv2.COLOR_RGB2BGR)
+        crop_img = view[:,27:480-27,:]
+        surf = pygame.surfarray.make_surface(crop_img)
+        nimg = pygame.transform.flip(surf, True, False)
 
         tt = 8 # time sec
         end = time.time()
@@ -189,7 +197,9 @@ while SB == 0:
             pygame.mixer.init()
             pygame.mixer.music.load('camerasound.mp3')
             pygame.mixer.music.play()
-            pygame.image.save(img, 'photos/img'+str(CUT)+'.jpg')
+            im = cv2.rotate(crop_img, cv2.cv2.ROTATE_90_CLOCKWISE)
+            im = Image.fromarray(im)
+            im.save('photos/img'+str(CUT)+'.jpg')
             CUT += 1
             begin = time.time()
             pygame.time.delay(1500)
