@@ -23,6 +23,7 @@ def makeframe(frame_path):
     }
 
     # 프레임 위에 이미지 넣기
+    # photos/anim/*.jpg
     for (filename, left_box, right_box) in zip(glob.iglob('photos/*.jpg', recursive=True), left_boxes.values(), right_boxes.values()):
         img = cv2.imread(filename)
         lp1, lp2 = left_box
@@ -54,12 +55,23 @@ def makeframe(frame_path):
 
     return frame,eigen
 
+def animate():
+    pass
+    '''
+    for i in range(1,5):
+        name = 'img' + str(i) +'.jpg'
+        animateoneImage('photos/'+name,'photos/'+'anim/'+name) #save at 'photos/'+name'''
+
 
 def generateImage(frameNum):
     frame = 'frames/'+str(frameNum)+'.jpg'
+    animate()
     result, eigen = makeframe(frame)
     cv2.imwrite('results/' + eigen + '.png', result)
     uploadtoServer('results/' + eigen + '.png', eigen)
+    return frame
+
+
 
 # 모든 프레임에 대해 이미지 넣고 결과 저장하기
 '''i=1
@@ -68,3 +80,4 @@ for frame in glob.iglob('frames/*.jpg', recursive=True):
     cv2.imwrite('results/'+eigen+'.png', result)
     uploadtoServer('results/'+eigen+'.png',eigen)
     i += 1'''
+
